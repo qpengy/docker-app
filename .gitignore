@@ -1,0 +1,35 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Logs and runtime data
+*.log
+logs/
+*.pid
+*.pid.lock
+*.seed
+
+# Docker local overrides and volumes
+docker-compose.override.yml
+**/data/
+**/tmp/
+
+# Editor and OS files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Common local/build artifacts
+node_modules/
+dist/
+build/
+coverage/
+.cache/
+
+# Temporary files
+*.tmp
+*.temp

@@ -1,0 +1,35 @@
+services:
+  arcane:
+    image: ghcr.io/getarcaneapp/arcane:v2.10.2
+    container_name: ${CONTAINER_NAME}
+    restart: always
+    networks:
+      - shared-network
+    cgroup: host
+    ports:
+      - "3552"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./data:/app/data
+      - ./builds:/builds
+      - ./backups:/backups
+      - ${DOCKER_PROJECTS_PATH}:/app/data/projects
+    environment:
+      - APP_URL=http://localhost:3552
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - JWT_SECRET=${JWT_SECRET}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.${CONTAINER_NAME}.loadbalancer.server.port=3552"
+      - "traefik.http.routers.${CONTAINER_NAME}.rule=Host(`${CONTAINER_NAME}.${APP_BASE_DOMAIN}`)"
+      - "traefik.http.routers.${CONTAINER_NAME}.service=${CONTAINER_NAME}"
+      - "traefik.http.routers.${CONTAINER_NAME}.entrypoints=web"
+      # - "traefik.http.routers.${CONTAINER_NAME}.entrypoints=websecure"
+      # - "traefik.http.routers.${CONTAINER_NAME}.tls=true"
+      # - "traefik.http.routers.${CONTAINER_NAME}.tls.certresolver=letsencrypt"
+      # - "traefik.http.routers.${CONTAINER_NAME}.tls.domains[0].main=*.${APP_BASE_DOMAIN}"
+networks:
+  shared-network:
+    external: true
