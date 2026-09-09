@@ -1,0 +1,36 @@
+services:
+  code-server:
+    image: linuxserver/code-server:4.135.0
+    container_name: ${CONTAINER_NAME}
+    restart: always
+    networks:
+      - shared-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "8443"
+    volumes:
+      - ./data:/config
+      - ${WORKSPACE_PATH}:${WORKSPACE_PATH}
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Shanghai
+      - PASSWORD=${WEB_PASSWORD}
+      - SUDO_PASSWORD=${SUDO_PASSWORD}
+      - DEFAULT_WORKSPACE=${WORKSPACE_PATH}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.${CONTAINER_NAME}.loadbalancer.server.port=8443"
+      - "traefik.http.routers.${CONTAINER_NAME}.service=${CONTAINER_NAME}"
+      - "traefik.http.routers.${CONTAINER_NAME}.rule=Host(`${CONTAINER_NAME}.${APP_BASE_DOMAIN}`)"
+      - "traefik.http.routers.${CONTAINER_NAME}.entrypoints=web"
+      # - "traefik.http.routers.${CONTAINER_NAME}.entrypoints=websecure"
+      # - "traefik.http.routers.${CONTAINER_NAME}.tls=true"
+      # - "traefik.http.routers.${CONTAINER_NAME}.tls.certresolver=letsencrypt"
+      # - "traefik.http.routers.${CONTAINER_NAME}.tls.domains[0].main=*.${APP_BASE_DOMAIN}"
+     
+networks:
+  shared-network:
+    external: true
